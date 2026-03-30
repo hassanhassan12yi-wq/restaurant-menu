@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كرم الشام | تجربة النار والسرعة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --brand-red: #e30613;
+            --brand-yellow: #ffc20e;
+            --bg-dark: #080808;
+            --card-bg: #121212;
+        }
+
+        * { box-sizing: border-box; scroll-behavior: smooth; }
+        body { background-color: var(--bg-dark); color: #fff; font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
+
+        /* --- اللوجو الثابت --- */
+        .fixed-logo { position: fixed; top: 20px; right: 20px; width: 80px; z-index: 10000; filter: drop-shadow(0 0 10px #000); }
+
+        /* --- سلة المشتريات --- */
+        .cart-float {
+            position: fixed; bottom: 20px; left: 20px;
+            background: var(--brand-red); color: #fff; padding: 12px 25px;
+            border-radius: 50px; z-index: 10000; border: 2px solid var(--brand-yellow);
+            display: flex; align-items: center; gap: 10px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 10px 30px rgba(227,6,19,0.5);
+        }
+
+        /* --- الهيرو (الفيديو) --- */
+        .hero { height: 80vh; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .hero video { position: absolute; min-width: 100%; min-height: 100%; z-index: -1; filter: brightness(0.4); }
+        .hero h1 { font-size: 3.5rem; color: var(--brand-yellow); text-align: center; }
+
+        /* --- الفلتر تحت الفيديو --- */
+        .filter-section { 
+            background: #111; padding: 30px 10px; display: grid; 
+            grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 900px; 
+            margin: -50px auto 0; position: relative; z-index: 10; 
+            border-radius: 25px; border: 1px solid #333; 
+        }
+        .filter-card { background: var(--card-bg); padding: 15px; border-radius: 15px; text-align: center; text-decoration: none; color: #fff; transition: 0.3s; }
+        .filter-card i { color: var(--brand-yellow); font-size: 1.5rem; margin-bottom: 5px; display: block; }
+
+        /* --- الموتوسيكل --- */
+        #bike { 
+            position: fixed; top: 50%; left: 50%; 
+            transform: translate(-50%,-50%); font-size: 50px; 
+            z-index: 1000; display: none; 
+            filter: drop-shadow(0 0 10px var(--brand-red));
+        }
+
+        /* --- تأثير الشرارة (The Sparks) --- */
+        .spark {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 999;
+            animation: fly 0.6s ease-out forwards;
+        }
+
+        @keyframes fly {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
+        }
+
+        /* --- الطريق والمنيو --- */
+        .road-container { position: relative; width: 100%; padding: 50px 0; }
+        .main-road { position: absolute; left: 50%; transform: translateX(-50%); width: 10px; height: 100%; background: #1a1a1a; }
+        .road-marks { 
+            position: absolute; width: 4px; height: 100%; left: 50%; transform: translateX(-50%); 
+            background: repeating-linear-gradient(to bottom, var(--brand-yellow) 0, var(--brand-yellow) 40px, transparent 40px, transparent 80px); 
+        }
+
+        .menu-item { height: 75vh; display: flex; justify-content: center; align-items: center; position: relative; }
+        .food-card { 
+            width: 300px; background: var(--card-bg); border-radius: 25px; 
+            overflow: hidden; border: 2px solid #222; transition: 0.5s ease; 
+        }
+        .active .food-card { border-color: var(--brand-yellow); transform: scale(1.15); box-shadow: 0 0 30px rgba(255,194,14,0.2); }
+
+        .price { color: var(--brand-red); font-weight: 900; font-size: 1.3rem; }
+        .add-btn { background: var(--brand-yellow); color: #000; border: none; padding: 5px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; float: left; }
+
+        @media (max-width: 768px) {
+            .filter-section { grid-template-columns: repeat(2, 1fr); width: 95%; }
+            .main-road { left: 25px; }
+            #bike { left: 25px; }
+            .menu-item { justify-content: flex-start; padding-left: 55px; }
+        }
+    </style>
+</head>
+<body>
+
+    <img src="logo.webp" class="fixed-logo">
+
+    <div class="cart-float" onclick="checkout()">
+        <i class="fas fa-shopping-basket"></i>
+        <span id="c-count">0</span> صنف | <span id="c-total">0</span> ج.م
+    </div>
+
+    <section class="hero">
+        <video autoplay muted loop playsinline><source src="WhatsApp Video 2026-03-17 at 4.20.03 PM.mp4"></video>
+        <h1>كرم الشام</h1>
+        <h1> اصل الطعم العربي </h1>
+    </section>
+
+    <div class="filter-section">
+        <a href="#item-1" class="filter-card"><i class="fas fa-bolt"></i><span>ماريا</span></a>
+        <a href="#item-10" class="filter-card"><i class="fas fa-fire"></i><span>فتة</span></a>
+        <a href="#item-20" class="filter-card"><i class="fas fa-drumstick-bite"></i><span>مشويات</span></a>
+        <a href="#item-30" class="filter-card"><i class="fas fa-hotdog"></i><span>كريب</span></a>
+    </div>
+
+    <div id="bike">🛵</div>
+
+    <div class="road-container">
+        <div class="main-road"><div class="road-marks"></div></div>
+        <div id="menu-list"></div>
+    </div>
+
+    <script>
+        let cart = [];
+        const items = [
+            { n: "ماريا دجاج سوبر", p: 95, img: "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=400" },
+            { n: "فتة كرم الشام", p: 145, img: "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=400" },
+            { n: "كيلو مشكل مشوي", p: 480, img: "https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400" }
+        ];
+
+        const list = document.getElementById('menu-list');
+        for(let i=1; i<=50; i++) {
+            const d = items[i % items.length];
+            list.innerHTML += `
+                <div class="menu-item ${i%2===0?'left':'right'}" id="item-${i}">
+                    <div class="food-card">
+                        <img src="${d.img}" style="width:100%; height:160px; object-fit:cover;">
+                        <div style="padding:15px;">
+                            <button class="add-btn" onclick="add('${d.n}', ${d.p})">+</button>
+                            <h3 style="margin:0; font-size:1.1rem;">${d.n}</h3>
+                            <span class="price">${d.p} ج.م</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function add(n, p) {
+            cart.push({n, p});
+            document.getElementById('c-count').innerText = cart.length;
+            document.getElementById('c-total').innerText = cart.reduce((s, x) => s + x.p, 0);
+        }
+
+        function checkout() {
+            if(!cart.length) return alert("السلة فاضية!");
+            let msg = "طلب جديد كرم الشام:\n" + cart.map((x,i)=>`${i+1}- ${x.n}`).join("\n") + "\n\nالإجمالي: " + document.getElementById('c-total').innerText + " ج.م";
+            window.open(`https://wa.me/201234567890?text=${encodeURIComponent(msg)}`);
+        }
+
+        // --- وظيفة إنشاء الشرارة ---
+        function createSpark(x, y, direction) {
+            const spark = document.createElement('div');
+            spark.className = 'spark';
+            
+            // ألوان النار (أحمر، برتقالي، أصفر)
+            const colors = ['#ff4500', '#ff8c00', '#ffd700'];
+            spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+            
+            // مكان الانطلاق (خلف الموتوسيكل)
+            spark.style.left = x + 'px';
+            spark.style.top = y + 'px';
+            
+            // اتجاه التناثر (عكس اتجاه الحركة)
+            const spreadX = (Math.random() - 0.5) * 30;
+            const spreadY = direction === 'down' ? -50 - Math.random() * 50 : 50 + Math.random() * 50;
+            
+            spark.style.setProperty('--x', `${spreadX}px`);
+            spark.style.setProperty('--y', `${spreadY}px`);
+            
+            document.body.appendChild(spark);
+            setTimeout(() => spark.remove(), 600);
+        }
+
+        let lastS = 0;
+        window.addEventListener('scroll', () => {
+            const bike = document.getElementById('bike');
+            const now = window.pageYOffset;
+            const isScrollingDown = now > lastS;
+            
+            if(now > 600) {
+                bike.style.display = 'block';
+                bike.style.transform = `translate(-50%,-50%) rotateY(${isScrollingDown ? 0 : 180}deg)`;
+                
+                // توليد الشرار أثناء السكرول
+                const rect = bike.getBoundingClientRect();
+                createSpark(rect.left + rect.width/2, rect.top + rect.height/2, isScrollingDown ? 'down' : 'up');
+            } else {
+                bike.style.display = 'none';
+            }
+            
+            lastS = now;
+
+            document.querySelectorAll('.menu-item').forEach(item => {
+                const r = item.getBoundingClientRect();
+                if(r.top < window.innerHeight/2 + 50 && r.bottom > window.innerHeight/2 - 50) item.classList.add('active');
+                else item.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
